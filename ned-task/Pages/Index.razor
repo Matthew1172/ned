@@ -1,0 +1,60 @@
+﻿@using ned_task.Models
+@inject MyUserServiceInterface MyUserService
+@page "/"
+
+<PageTitle>Index</PageTitle>
+
+<SfGrid DataSource="@MyUsers" Toolbar="@(new List<string>() { "Add", "Edit", "Delete", "Cancel", "Update" })" TValue="MyUser">
+    <GridEditSettings AllowAdding="true" AllowDeleting="true" AllowEditing="true" Mode="EditMode.Normal"></GridEditSettings>
+    <GridEvents OnActionBegin="ActionBeginHandler" OnActionComplete="ActionCompleteHandler" TValue="MyUser"></GridEvents>
+    <GridColumns>
+        <GridColumn Field="@nameof(MyUser.Id)" IsPrimaryKey="true" IsIdentity="true" Visible="false"></GridColumn>
+        <GridColumn Field="@nameof(MyUser.fname)"></GridColumn>
+        <GridColumn Field="@nameof(MyUser.lname)"></GridColumn>
+        <GridColumn Field="@nameof(MyUser.email)"></GridColumn>
+    </GridColumns>
+</SfGrid>
+
+@code
+{
+    public IEnumerable<MyUser> MyUsers { get; set; }
+
+    protected override void OnInitialized()
+    {
+        MyUsers = MyUserService.GetMyUsers();
+    }
+
+    public void ActionBeginHandler(ActionEventArgs<MyUser> Args)
+    {
+        //Will be triggered when CRUD action is initiated
+        if (Args.RequestType.Equals(Syncfusion.Blazor.Grids.Action.Save))
+        {
+            switch(Args.Action){
+                case "Add":
+                    //add a user
+                    MyUserService.InsertMyUser(Args.Data);
+                    break;
+                case "Edit":
+                    //edit a user
+                    MyUserService.UpdateMyUser(Args.Data.Id, Args.Data);
+                    break;
+                default:
+                    break;
+            }
+        }
+        else if (Args.RequestType.Equals(Syncfusion.Blazor.Grids.Action.Delete))
+        {
+            //delete user
+            MyUserService.DeleteMyUser(Args.Data.Id);
+        }
+    }
+
+    public void ActionCompleteHandler(ActionEventArgs<MyUser> Args)
+    {
+        //will be triggered when CRUD action is complete.
+        if (Args.RequestType.Equals(Syncfusion.Blazor.Grids.Action.Save))
+        {
+            MyUsers = MyUserService.GetMyUsers();
+        }
+    }
+}
