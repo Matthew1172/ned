@@ -1,9 +1,15 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System.Diagnostics.CodeAnalysis;
+﻿/*
+ * 
+ * This class holds the Database context, which is a List that can have CRUD operations performed on it.
+ * Once the operation is finished, we call SaveChanges() method on the list, which will update our DB.
+ * 
+ */
+
+using Microsoft.EntityFrameworkCore;
 
 namespace ned_task.Models
 {
-    public partial class MyUserContext : DbContext
+    public class MyUserContext : DbContext
     {
         public MyUserContext()
         {
@@ -16,6 +22,7 @@ namespace ned_task.Models
 
         }
 
+        //Configure the model according to our table in the DB.
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<MyUser>(entity =>
@@ -35,12 +42,9 @@ namespace ned_task.Models
                     .IsUnicode(false);
             });
 
-            OnModelCreatingPartial(modelBuilder);
         }
 
-        partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
-
-        public virtual DbSet<MyUser> MyUsers { get; set; } = null!;
+        public DbSet<MyUser> MyUsers { get; set; } = null!;
 
     }
 }
